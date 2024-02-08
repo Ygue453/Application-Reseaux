@@ -10,14 +10,20 @@ public class Stress1 {
         this.nbClient = nbClient;
     }
     public static void main(String[] args) throws UnknownHostException, IOException {
-        try {
-            Integer.parseInt(args[0]);
-        } catch (Exception e) {
-            System.out.println("Synthaxe : java Stress1 [nbClient]");
+        if (args.length == 1){
+            long time = System.nanoTime();
+            try {
+                Stress1 stress = new Stress1(Integer.parseInt(args[0]));
+                for (int i = 0; i < stress.nbClient; i++){
+                    stress.clientStressant(i + 1);
+                }
+            } catch (Exception e) {
+                System.out.println("Synthaxe : java Stress1 [nbClient]");
+            }
+            System.out.println((System.nanoTime() - time)/1000000 + " millisecondes");
         }
-        Stress1 stress = new Stress1(Integer.parseInt(args[0]));
-        for (int i = 0; i < stress.nbClient; i++){
-            stress.clientStressant(i + 1);
+        else {
+            System.out.println("Error : La synthaxe est java Stress1 [nb clients stressants]");
         }
     }
 
