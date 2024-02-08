@@ -1,0 +1,6 @@
+Les fichiers complets du TP sont Main.java et les fichier bonus (les autres existe a titre indicatif d'avancé).
+
+Bonus : Pour tester les fichier bonus, il faut écrire dans un terminal
+        les commandes suivantes dans l'ordre :
+            $java BonusScriptJava.java
+            $python3 BonusScriptPython.py
