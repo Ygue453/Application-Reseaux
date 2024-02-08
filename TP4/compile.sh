@@ -1,0 +1,1 @@
+javac *.java;javac */*.java
