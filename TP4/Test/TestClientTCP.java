@@ -1,10 +1,11 @@
+package Test;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-public class ClientTCP{
+public class TestClientTCP{
     static Scanner clavier = new Scanner(System.in);
     static String ip;
     static int port;
@@ -39,6 +40,10 @@ public class ClientTCP{
 
         byte[] buffer = new byte[8192];
         int bytes = -1;
+        if ((bytes = input.read(buffer)) != -1){
+            String message = new String(buffer, 0, bytes);
+            System.out.println(message + "\n");
+        }
 
         while (true) {
             System.out.println("Enter your line :");
