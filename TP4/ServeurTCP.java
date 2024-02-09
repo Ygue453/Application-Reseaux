@@ -1,11 +1,9 @@
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.util.Scanner;
 import java.net.Socket;
 
 public class ServeurTCP{
-    Scanner clavier;
     String ip;
     int port;
 
@@ -15,7 +13,6 @@ public class ServeurTCP{
     }
 
     public ServeurTCP(){
-        this.clavier = new Scanner(System.in);
         this.ip = "localhost";
         this.port = 1234;
     }
