@@ -6,15 +6,22 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class Stress1 {
+
+    
+
+    static int nbIteration = 6;
+    static double[] values = new double[nbIteration];
+    static int[] iteration = new int[nbIteration];
+
     private int nbClient;
-    private double[] values;
 
     public Stress1(int nbClient){
         this.nbClient = nbClient;
-        this.values = new double[nbClient];
     }
+
     public static void main(String[] args) throws UnknownHostException, IOException {
-        long time = System.nanoTime();
+        /*
+        long time = System.nanotime();
         if (args.length == 1){
             try {
                 Stress1 stress = new Stress1(Integer.parseInt(args[0]));
@@ -27,10 +34,31 @@ public class Stress1 {
             }
         }
         else {
-            System.out.println("Error : La synthaxe est java Stress1 [nb clients stressants]");
+            System.out.println("Synthaxe : java Stress1 [nbClient]");
         }
         double t = (System.nanoTime() - time);
         System.out.println("Total : " + t/1000000 + " millisecondes");
+        */
+
+        
+        iteration[0] = 1;
+        iteration[1] = 2;
+        iteration[2] = 10;
+        iteration[3] = 100;
+        iteration[4] = 1000;
+        iteration[5] = 5000;
+
+        for (int i = 0; i < iteration.length; i++){
+            Stress1 stress = new Stress1(iteration[i]);
+            long time = System.nanoTime();
+            for (int y = 0; y < iteration[i]; y++){
+                stress.clientStressant(y+1);
+            }
+            double t = (System.nanoTime() - time);
+            values[i] = t;
+            System.out.println("Total : " + t/1000000 + " millisecondes");
+        }
+        creerCSV();
     }
 
     public void clientStressant(int n) throws UnknownHostException, IOException{
@@ -41,27 +69,27 @@ public class Stress1 {
         String msg = "Client stress1 n°" + n;
         output.write(msg.getBytes());
 
-        long time = System.nanoTime();
+        //long time = System.nanoTime();
 
         byte[] buffer = new byte[8192];
         int bytes = -1;
         if ((bytes = input.read(buffer)) != -1){
-            double t = (System.nanoTime() - time);
+            /*double t = (System.nanoTime() - time);
             values[n-1] = t;
-            System.out.println("Reponse client " + n + " : " + t/1000000 + " milllisecondes");
+            System.out.println("Reponse client " + n + " : " + t/1000000 + " milllisecondes");*/
         }
 
         client.close();
     }
 
-    public void creerCSV() throws IOException{
+    public static void creerCSV() throws IOException{
         FileWriter fileWriter = new FileWriter("PingServeurTCP.csv");
-        fileWriter.append("N° client;");
-        for (int i = 0; i < this.nbClient; i++){
-            fileWriter.append("client : " + (i + 1) + ";");
+        fileWriter.append("Nombre de clients;");
+        for (int i = 0; i < nbIteration; i++){
+            fileWriter.append(iteration[i] + " clients;");
         }
-        fileWriter.append("\nLatence du Serveur en millisecondes;");
-        for (int i = 0; i < this.nbClient; i++){
+        fileWriter.append("\nTemps d'execution du Serveur en millisecondes;");
+        for (int i = 0; i < nbIteration; i++){
             String value = values[i]/1000000 + "";
             value = value.replace('.', ',');
             fileWriter.append(value + ";");
