@@ -56,9 +56,15 @@ public class Stress1 {
 
     public void creerCSV() throws IOException{
         FileWriter fileWriter = new FileWriter("PingServeurTCP.csv");
-        fileWriter.append("N° client;Latence du Serveur\n");
+        fileWriter.append("N° client;");
         for (int i = 0; i < this.nbClient; i++){
-            fileWriter.append(i + 1 + ";" + this.values[i]/1000000 + "\n");
+            fileWriter.append("client : " + (i + 1) + ";");
+        }
+        fileWriter.append("\nLatence du Serveur en millisecondes;");
+        for (int i = 0; i < this.nbClient; i++){
+            String value = values[i]/1000000 + "";
+            value = value.replace('.', ',');
+            fileWriter.append(value + ";");
         }
         fileWriter.close();
     }
