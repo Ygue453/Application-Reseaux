@@ -28,7 +28,7 @@ public class Serveur {
             serveur.bind(new InetSocketAddress(ip, port));
             serveur.configureBlocking(false);
             serveur.register(selector, SelectionKey.OP_ACCEPT);
-            System.out.println("Server Ligne up\n-------------------\n");
+            System.out.println("Server up\n-------------------\n");
             
             while (true){
                 selector.select();
@@ -41,7 +41,7 @@ public class Serveur {
                     }
                     if (key.isReadable()) {
                         SocketChannel client = (SocketChannel) key.channel();
-                        ByteBuffer buffer = ByteBuffer.allocate(128);
+                        ByteBuffer buffer = ByteBuffer.allocate(1024);
                         int bytesRead = client.read(buffer);
 
                         if (bytesRead < 1){
@@ -52,11 +52,13 @@ public class Serveur {
 
                         if (bytesRead > 0) {
                             buffer.flip();
+
                             byte[] bytes = new byte[bytesRead];
                             buffer.get(bytes);
                             String message = ">" + new String(bytes, "UTF-8");
                             echoServer(message);
                             client.write(ByteBuffer.wrap(message.getBytes("UTF-8")));
+
                             key.cancel();
                             client.close();
                         }

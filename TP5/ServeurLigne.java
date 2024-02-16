@@ -22,46 +22,53 @@ public class ServeurLigne {
     }
 
     public void serveur() throws IOException{
-        try (ServerSocketChannel serveur = ServerSocketChannel.open();
-            Selector selector = Selector.open()){
-                serveur.bind(new InetSocketAddress(ip, port));
-                System.out.println("Server Ligne up\n-------------------\n");
-                
-                serveur.configureBlocking(false);
+        try {
+            ServerSocketChannel serveur = ServerSocketChannel.open();
+            Selector selector = Selector.open();
+            serveur.bind(new InetSocketAddress(ip, port));
+            serveur.configureBlocking(false);
+            serveur.register(selector, SelectionKey.OP_ACCEPT);
+            System.out.println("ServerLigne up\n-------------------\n");
+            
+            while (true){
+                selector.select();
+                Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
+                while (iterator.hasNext()){
+                    SelectionKey key = iterator.next();
+                    iterator.remove();
+                    if (key.isAcceptable()){
+                        handleClient(serveur, selector);
+                    }
+                    if (key.isReadable()) {
+                        SocketChannel client = (SocketChannel) key.channel();
+                        ByteBuffer buffer = ByteBuffer.allocate(1024);
+                        int bytesRead = client.read(buffer);
 
-                serveur.register(selector, SelectionKey.OP_ACCEPT);
-
-                while (true){
-                    selector.select();
-                    Iterator<SelectionKey> iterator = selector.selectedKeys().iterator();
-                    while (iterator.hasNext()){
-                        SelectionKey key = iterator.next();
-                        iterator.remove();
-                        if (key.isAcceptable()){
-                            handleClient(serveur, selector);
+                        if (bytesRead < 1){
+                            key.cancel();
+                            client.close();
+                            System.err.println("No data found");
                         }
-                        if (key.isReadable()) {
-                            SocketChannel client = (SocketChannel) key.channel();
-                            ByteBuffer buffer = ByteBuffer.allocate(128);
-                            int bytesRead = client.read(buffer);
 
-                            if (bytesRead > 0) {
-                                buffer.flip();
-                                byte[] bytes = new byte[bytesRead];
-                                buffer.get(bytes);
-                                String message = ">" + new String(bytes, "UTF-8");
-                                echoServer(message);
-                                client.write(ByteBuffer.wrap(message.getBytes("UTF-8")));
-                                key.cancel();
-                                client.close();
-                            }
-                            buffer.clear();
+                        if (bytesRead > 0) {
+                            buffer.flip();
+
+                            byte[] bytes = new byte[bytesRead];
+                            buffer.get(bytes);
+                            String message = ">" + new String(bytes, "UTF-8");
+                            echoServer(message);
+                            client.write(ByteBuffer.wrap(message.getBytes("UTF-8")));
+
+                            key.cancel();
+                            client.close();
 
                             ((Counter) key.attachment()).increment();
                             System.out.println("Number of lines of this connection : " + ((Counter)key.attachment()).getCounter());
                         }
+                        buffer.clear();
                     }
                 }
+            }
             } catch (IOException e) {
             System.err.println("Error : The server has encouter a problem.");
         }
